@@ -36,7 +36,7 @@ const getQuotes = async () => {
     await page.keyboard.press('Escape') // fecha o banner
     await page.locator('.load-more-programacao').wait() // espera o carregar mais
     await page.click('.load-more-programacao') // clicar no botão +
-    await page.waitForSelector('.load-more-programacao').ElementHandle.isHidden()
+    await page.waitForSelector('div.load-more-programacao[style="display: none;"]')
     // await page.waitForFunction(() => {
     //     const element = document.querySelector('.load-more-programacao');
     //     // Return true if the element is not displayed (style display: none) or any other condition you need
@@ -63,7 +63,46 @@ const getQuotes = async () => {
         })
 
     })
-    console.log(links)
+
+
+    for (const link of links) {
+        const page2 = await browser.newPage()
+        try {await page2.goto(link.link, {
+            waitUntil: "domcontentloaded"
+            
+        });
+        } catch {
+            console.log("link aberto")
+            
+    const programacaoData = await page2.evaluate(() => {
+        const programacao = Array.from(document.querySelectorAll('.programacao'));
+        return programacao.map(prog => {
+            const title = prog.querySelector('.post-title').textContent;
+            const cardsDate = prog.querySelector('.data-local svg').nextSibling.textContent.trim()
+            // const valor = prog.querySelector('.notice__excerpt_inner strong')?.textContent
+            return {
+                titulo: title,
+                data: cardsDate.replace((/\s+/g, ' ').trim())
+                // valor: valor
+            };
+        });
+    });
+    console.log(programacaoData)
+        
+        }finally {
+            // console.log(link.link)
+            await page2.close()
+        }
+    }
+    
+    // links.forEach(async (a,b) =>{
+    //     console.log(a.link)
+        
+    //     await page2.goto(a.link, {
+    //         waitUntil: "domcontentloaded",
+    //     });
+    // })
+    // console.log(links)
 
 
 
@@ -111,6 +150,5 @@ const getQuotes = async () => {
 
 
 
-};
-
-getQuotes();
+    };
+getQuotes()
