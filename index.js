@@ -10,7 +10,7 @@ import puppeteer from "puppeteer";
 //     password: "0000",
 //     port: 5432,
 // });
-
+//
 
 
 const getQuotes = async () => {
