@@ -66,38 +66,44 @@ const getQuotes = async () => {
 
 
     for (const link of links) {
-        const page2 = await browser.newPage()
-        try {await page2.goto(link.link, {
-            waitUntil: "domcontentloaded"
-            
-        });
-        } catch {
-            console.log("link aberto")
-            
-    const programacaoData = await page2.evaluate(() => {
-        const programacao = Array.from(document.querySelectorAll('.programacao'));
-        return programacao.map(prog => {
-            const title = prog.querySelector('.post-title').textContent;
-            const cardsDate = prog.querySelector('.data-local svg').nextSibling.textContent.trim()
-            // const valor = prog.querySelector('.notice__excerpt_inner strong')?.textContent
-            return {
-                titulo: title,
-                data: cardsDate.replace((/\s+/g, ' ').trim())
-                // valor: valor
-            };
-        });
-    });
-    console.log(programacaoData)
-        
-        }finally {
-            // console.log(link.link)
-            await page2.close()
+        const page2 = await browser.newPage();
+        try {
+            // Attempt to navigate to the page
+            await page2.goto(link.link, {
+                waitUntil: "domcontentloaded"
+            });
+
+            // Extract specific data from the page
+            const programacaoData = await page2.evaluate(() => {
+                // Example of extracting multiple types of data
+                const titles = document.querySelector('.post-title').textContent.trim();
+                const dates = document.querySelector('.data-local svg').nextSibling.textContent.trim();
+                const local = document.querySelector('div.col-md-5.textos .item')?.querySelector('span')?.innerText || null;
+                const valor = document.querySelector('div.col-md-5.textos [class="notice__excerpt_inner"]')?.querySelector('strong')?.textContent || null;
+
+                return {
+                    titulo: titles || 'Sem Titulo',
+                    data: dates || 'Sem Data',
+                    local: local || 'Sem Local',
+                    valor: valor || 'Sem Valor'
+                };
+            });
+
+            // Log the extracted data
+            console.log(`Data from ${link.link}:`, programacaoData);
+
+        } catch (error) {
+            // Handle errors during page navigation or evaluation
+            console.error(`Failed to load ${link.link}:`, error);
+        } finally {
+            // Close the page
+            await page2.close();
         }
     }
-    
+
     // links.forEach(async (a,b) =>{
     //     console.log(a.link)
-        
+
     //     await page2.goto(a.link, {
     //         waitUntil: "domcontentloaded",
     //     });
@@ -150,5 +156,5 @@ const getQuotes = async () => {
 
 
 
-    };
+};
 getQuotes()
