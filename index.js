@@ -78,14 +78,28 @@ const getQuotes = async () => {
                 // Example of extracting multiple types of data
                 const titles = document.querySelector('.post-title').textContent.trim();
                 const dates = document.querySelector('.data-local svg').nextSibling.textContent.trim();
-                const local = document.querySelector('div.col-md-5.textos .item')?.querySelector('span')?.innerText || null;
-                const valor = document.querySelector('div.col-md-5.textos [class="notice__excerpt_inner"]')?.querySelector('strong')?.textContent || null;
+                const dados = document?.querySelectorAll('div.col-md-5.textos .item') || null;
+                const valor = document.querySelector('div.col-md-5.textos [class="notice__excerpt_inner"]')?.querySelector('strong')?.textContent || null; const descricao = document?.querySelector('.descricao').textContent || null;
+
+
+                function cleanContent(content) {
+                    let cleaned = content.trim();
+                    cleaned = cleaned.replace(/\n+/g, ' ');
+                    cleaned = cleaned.replace(/\s{2,}/g, ' ');
+                    return cleaned;
+                }
+
+                const dataTratada = cleanContent(dates ? dates : null)
+                const descricaoTratado = cleanContent(descricao ? descricao : null)
 
                 return {
                     titulo: titles || 'Sem Titulo',
-                    data: dates || 'Sem Data',
-                    local: local || 'Sem Local',
-                    valor: valor || 'Sem Valor'
+                    data: dataTratada || 'Sem Data',
+                    local: dados[0]?.querySelector('span')?.textContent || 'Sem Local',
+                    classificacao: dados[1]?.querySelector('span')?.textContent || 'Sem classificacao',
+                    duracao: dados[2]?.querySelector('span')?.textContent || 'Sem duracao',
+                    valor: valor || 'Sem Valor',
+                    descricao: descricaoTratado ? descricaoTratado : 'Sem descricao'
                 };
             });
 
